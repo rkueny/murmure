@@ -5,12 +5,14 @@ use tauri::{AppHandle, Manager};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppSettings {
     pub shortcut: String,
+    pub dictionary: Vec<String>,
 }
 
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
             shortcut: "win+ctrl".to_string(),
+            dictionary: Vec::new(),
         }
     }
 }

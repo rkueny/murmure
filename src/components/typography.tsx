@@ -1,6 +1,21 @@
 import clsx from 'clsx';
 
 export const Typography = {
+    MainTitle: ({
+        children,
+        className,
+        ...props
+    }: React.HTMLAttributes<HTMLHeadingElement>) => {
+        return (
+            <h1
+                className={clsx('text-2xl font-semibold mb-1', className)}
+                {...props}
+            >
+                {children}
+            </h1>
+        );
+    },
+
     Title: ({
         children,
         className,
@@ -19,7 +34,13 @@ export const Typography = {
         ...props
     }: React.HTMLAttributes<HTMLParagraphElement>) => {
         return (
-            <p className={clsx('text-sm text-zinc-400', className)} {...props}>
+            <p
+                className={clsx(
+                    'text-sm text-zinc-400 justify-evenly',
+                    className
+                )}
+                {...props}
+            >
                 {children}
             </p>
         );

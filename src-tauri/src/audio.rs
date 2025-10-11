@@ -15,6 +15,7 @@ use std::sync::{Arc, Mutex};
 use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::Manager;
+use crate::dictionary::{fix_transcription_with_dictionary, get_cc_rules_path, Dictionary};
 
 type WavWriterType = WavWriter<BufWriter<File>>;
 type RecorderType = Arc<Mutex<Option<WavWriterType>>>;
@@ -97,8 +98,13 @@ pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
 
             match preload_engine(app) {
                 Ok(_) => match transcribe_audio(p.as_path()) {
-                    Ok(text) => {
-                        println!("Transcription: {}", text);
+                    Ok(raw_text) => {
+                        println!("Transcription: {}", raw_text);
+
+                        let cc_rules_path = get_cc_rules_path(app).unwrap();
+                        let dictionary = app.state::<Dictionary>().get();
+                        let text = fix_transcription_with_dictionary(raw_text, dictionary, cc_rules_path);
+                        println!("Transcription fixed with dictionary: {}", text);
 
                         if let Err(e) = history::add_transcription(app, text.clone()) {
                             eprintln!("Failed to save to history: {}", e);

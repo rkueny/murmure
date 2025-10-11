@@ -1,6 +1,7 @@
 mod audio;
 mod clipboard;
 mod commands;
+mod dictionary;
 mod engine;
 mod history;
 mod model;
@@ -10,6 +11,7 @@ mod tray_icon;
 
 use audio::preload_engine;
 use commands::*;
+use dictionary::Dictionary;
 use model::Model;
 use shortcuts::init_shortcuts;
 use std::sync::Arc;
@@ -30,6 +32,9 @@ pub fn run() {
                 Arc::new(Model::new(app.handle().clone()).expect("Failed to initialize model"));
             app.manage(model);
 
+            let s = settings::load_settings(&app.handle());
+            app.manage(Dictionary::new(s.dictionary.clone()));
+
             match preload_engine(&app.handle()) {
                 Ok(_) => println!("Transcription engine ready"),
                 Err(e) => println!("Transcription engine will be loaded on first use: {}", e),
@@ -37,7 +42,6 @@ pub fn run() {
 
             setup_tray(&app.handle())?;
 
-            let s = settings::load_settings(&app.handle());
             let keys = shortcuts::parse_binding_keys(&s.shortcut);
             app.manage(ShortcutKeys::new(keys));
 
@@ -56,6 +60,8 @@ pub fn run() {
             get_recent_transcriptions,
             get_shortcut,
             set_shortcut,
+            set_dictionary,
+            get_dictionary,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

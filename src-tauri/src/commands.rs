@@ -1,3 +1,4 @@
+use crate::dictionary::Dictionary;
 use crate::history::{self, HistoryEntry};
 use crate::model::Model;
 use crate::settings;
@@ -43,4 +44,21 @@ pub fn set_shortcut(app: AppHandle, binding: String) -> Result<String, String> {
     app.state::<ShortcutKeys>().set(keys);
 
     Ok(normalized)
+}
+
+#[tauri::command]
+pub fn set_dictionary(app: AppHandle, dictionary: Vec<String>) -> Result<(), String> {
+    let mut s = settings::load_settings(&app);
+    s.dictionary = dictionary.clone();
+    settings::save_settings(&app, &s)?;
+
+    app.state::<Dictionary>().set(dictionary.clone());
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_dictionary(app: AppHandle) -> Result<Vec<String>, String> {
+    let s = settings::load_settings(&app);
+    Ok(s.dictionary)
 }

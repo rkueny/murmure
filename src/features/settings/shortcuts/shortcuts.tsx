@@ -4,6 +4,7 @@ import { ShortcutButton } from './shortcut-button/shortcut-button';
 import { RenderKeys } from '../../../components/render-keys';
 import { SettingsUI } from '@/components/settings-ui';
 import { useRecordShortcutState } from './hooks/use-record-shortcut-state';
+import { Page } from '@/components/page';
 
 interface ShortcutsProps {}
 
@@ -12,16 +13,17 @@ export const Shortcuts = ({}: ShortcutsProps) => {
         useRecordShortcutState();
 
     return (
-        <main className="px-8 py-6 text-white">
+        <main>
             <div className="space-y-8">
-                <div>
-                    <h1 className="text-2xl font-semibold mb-1">Shortcuts</h1>
-                    <p className="text-sm text-zinc-400">
-                        Configure keyboard shortcuts for recording
-                    </p>
-                </div>
+                <Page.Header>
+                    <Typography.MainTitle>Shortcuts</Typography.MainTitle>
+                    <Typography.Paragraph className="text-zinc-400">
+                        Set up Murmure's keyboard shortcuts to improve your
+                        workflow. Windows is fully supported.
+                    </Typography.Paragraph>
+                </Page.Header>
 
-                <div className="space-y-6 flex flex-col items-center">
+                <div className="space-y-6 flex justify-center">
                     <SettingsUI.Container>
                         <SettingsUI.Item>
                             <SettingsUI.Description>
