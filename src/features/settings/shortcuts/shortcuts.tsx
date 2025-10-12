@@ -19,7 +19,7 @@ export const Shortcuts = ({}: ShortcutsProps) => {
                     <Typography.MainTitle>Shortcuts</Typography.MainTitle>
                     <Typography.Paragraph className="text-zinc-400">
                         Set up Murmure's keyboard shortcuts to improve your
-                        workflow. Windows is fully supported.
+                        workflow.
                     </Typography.Paragraph>
                 </Page.Header>
 

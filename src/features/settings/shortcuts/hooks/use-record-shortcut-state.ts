@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 export const useRecordShortcutState = () => {
-    const [shortcut, setShortcut] = useState('win+ctrl');
+    const [shortcut, setShortcut] = useState('ctrl+space');
 
     const loadShortcut = async () => {
         try {
@@ -31,8 +31,8 @@ export const useRecordShortcutState = () => {
     };
 
     const resetShortcut = () => {
-        setShortcut('win+ctrl');
-        saveShortcut('win+ctrl');
+        setShortcut('ctrl+space');
+        saveShortcut('ctrl+space');
     };
 
     return {

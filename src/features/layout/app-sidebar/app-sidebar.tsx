@@ -42,7 +42,7 @@ export const AppSidebar = () => {
     return (
         <Sidebar
             collapsible="none"
-            className="bg-zinc-900 border-zinc-700 min-h-screen h-full"
+            className="bg-zinc-900 border-zinc-700 min-h-screen h-full w-58 border-r"
         >
             <SidebarHeader className="flex items-center justify-center bg-zinc-900 border-b border-zinc-700">
                 <img src="app-icon.png" alt="logo" className="w-16 h-16" />

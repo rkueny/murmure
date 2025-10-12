@@ -8,7 +8,7 @@ export const Page = {
         ...props
     }: React.HTMLAttributes<HTMLDivElement>) => {
         return (
-            <div className={clsx('max-w-xl', className)} {...props}>
+            <div className={clsx(className)} {...props}>
                 {children}
             </div>
         );

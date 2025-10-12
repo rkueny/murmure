@@ -23,9 +23,15 @@ export const History = ({}: HistoryProps) => {
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <Typography.Paragraph>
-                                    {entry.text}
+                                    {entry.text === '' ? (
+                                        <span className="italic text-xs">
+                                            (Empty transcription)
+                                        </span>
+                                    ) : (
+                                        entry.text
+                                    )}
                                 </Typography.Paragraph>
-                                <Typography.Paragraph className="text-xs">
+                                <Typography.Paragraph className="text-xs block w-20 text-right">
                                     {formatTime(entry.timestamp)}
                                 </Typography.Paragraph>
                             </div>

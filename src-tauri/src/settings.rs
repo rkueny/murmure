@@ -11,7 +11,7 @@ pub struct AppSettings {
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
-            shortcut: "win+ctrl".to_string(),
+            shortcut: "ctrl+space".to_string(),
             dictionary: Vec::new(),
         }
     }

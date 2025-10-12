@@ -15,8 +15,7 @@ export const System = () => {
                     <Typography.MainTitle>System</Typography.MainTitle>
                     <Typography.Paragraph className="text-zinc-400">
                         Adjust system preferences to control Murmure's behavior
-                        at startup and more. Murmure only operates based on your
-                        explicit configuration.
+                        at startup and more.
                     </Typography.Paragraph>
                 </Page.Header>
 

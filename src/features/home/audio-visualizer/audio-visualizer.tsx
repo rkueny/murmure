@@ -1,26 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { listen } from '@tauri-apps/api/event';
+import { useEffect, useMemo, useRef } from 'react';
+import { useLevelState } from './hooks/use-level-state';
+import clsx from 'clsx';
+import { AudioPixel } from './audio-pixel/audio-pixel';
 
-type Props = {
+interface AudioVisualizerProps {
     bars?: number;
     rows?: number;
     className?: string;
-};
+}
 
-export const AudioVisualizer = ({ bars = 16, rows = 20, className }: Props) => {
-    const [level, setLevel] = useState(0);
+export const AudioVisualizer = ({
+    bars = 16,
+    rows = 20,
+    className,
+}: AudioVisualizerProps) => {
+    const { level } = useLevelState();
     const rafRef = useRef<number | null>(null);
     const displayedRef = useRef(0);
-
-    useEffect(() => {
-        const unlistenPromise = listen<number>('mic-level', (e) => {
-            const value = Math.max(0, Math.min(1, Number(e.payload ?? 0)));
-            setLevel(value);
-        });
-        return () => {
-            unlistenPromise.then((un) => un());
-        };
-    }, []);
 
     useEffect(() => {
         const tick = () => {
@@ -48,44 +44,36 @@ export const AudioVisualizer = ({ bars = 16, rows = 20, className }: Props) => {
         return arr;
     }, [bars, level]);
 
-    const getPixelColor = (distanceFromCenter: number) => {
-        if (distanceFromCenter <= 1) {
-            return `hsl(239, 84%, 67%)`;
-        } else if (distanceFromCenter <= 2.5) {
-            return `hsl(199, 89%, 48%)`;
-        } else {
-            return `hsl(180, 100%, 50%)`;
-        }
-    };
-
     return (
-        <div className={`flex gap-[2px] w-full ${className ?? ''}`}>
+        <div className={clsx('flex gap-0.5 w-full', className)}>
             {heights.map((h, colIdx) => {
                 const halfRows = Math.floor(rows / 2);
                 const litHalfRows = Math.floor(h * halfRows);
+                const isEdgeColumn = colIdx === 0 || colIdx === bars - 1;
+                const centerStart = Math.floor(bars / 2) - 4;
+                const centerEnd = Math.floor(bars / 2) + 3;
+                const isCenterColumn =
+                    colIdx >= centerStart && colIdx <= centerEnd;
+                const hasSound = litHalfRows > 1;
                 return (
-                    <div
-                        key={colIdx}
-                        className="flex flex-col gap-[2px] flex-1"
-                    >
+                    <div key={colIdx} className="flex flex-col gap-0.5 flex-1">
                         {Array.from({ length: rows }).map((_, rowIdx) => {
+                            const centerIndex = (rows - 1) / 2;
                             const distanceFromCenter = Math.abs(
-                                rowIdx - halfRows + 0.5
+                                rowIdx - centerIndex
                             );
+                            const minDistance = rows % 2 === 0 ? 0.5 : 0;
                             const isLit =
-                                distanceFromCenter <= Math.max(litHalfRows, 1);
+                                distanceFromCenter <=
+                                Math.max(litHalfRows, minDistance);
                             return (
-                                <div
+                                <AudioPixel
                                     key={rowIdx}
-                                    className="w-full transition-opacity duration-100"
-                                    style={{
-                                        height: '10px',
-                                        backgroundColor: isLit
-                                            ? getPixelColor(distanceFromCenter)
-                                            : 'transparent',
-                                        opacity: isLit ? 0.9 : 0.15,
-                                        border: '0.5px solid rgba(100, 100, 100, 0.2)',
-                                    }}
+                                    isLit={isLit}
+                                    distanceFromCenter={distanceFromCenter}
+                                    isEdgeColumn={isEdgeColumn}
+                                    isCenterColumn={isCenterColumn}
+                                    hasSound={hasSound}
                                 />
                             );
                         })}
