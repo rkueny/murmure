@@ -18,18 +18,21 @@ export const Home = () => {
                 </Typography.Paragraph>
             </Page.Header>
 
-            <div className="space-y-2 flex flex-col items-center">
-                <Typography.Title>Live input</Typography.Title>
-                <div className="rounded-md border border-zinc-700 p-2 space-y-4 relative">
-                    <AudioVisualizer bars={34} rows={21} />
-                    <Typography.Paragraph className="text-xs absolute bottom-2 left-2">
-                        Hold <RenderKeys keyString={recordShortcut} /> to record
-                    </Typography.Paragraph>
+            <div className="space-y-4">
+                <div className="space-y-2 flex flex-col items-center">
+                    <Typography.Title>Live input</Typography.Title>
+                    <div className="rounded-md border border-zinc-700 p-2 space-y-4 relative">
+                        <AudioVisualizer bars={34} rows={21} />
+                        <Typography.Paragraph className="text-xs absolute bottom-2 left-2">
+                            Hold <RenderKeys keyString={recordShortcut} /> to
+                            record
+                        </Typography.Paragraph>
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex justify-center">
-                <History />
+                <div className="flex justify-center">
+                    <History />
+                </div>
             </div>
         </main>
     );
