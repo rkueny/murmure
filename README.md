@@ -34,6 +34,17 @@ Because all computation is local, no network connection is required.
 
 Murmure uses NVIDIA’s Parakeet TDT, a highly experimental optimized transformer-based speech recognition model designed for low-latency, on-device inference. It combines fast transcription with strong accuracy across multiple languages, running efficiently on consumer GPUs or CPUs.
 
+## Changelog
+
+| Version       | Date       | Notes           |
+| ------------- | ---------- | --------------- |
+| `1.0.0-alpha` | 2025-10-13 | Initial version |
+
+## License
+
+Murmure is free and open source, released under the GNU GPL v3 License.
+You can inspect, modify, and redistribute it freely as long as derivative work remains open source.
+
 ## Contributing
 
 Contributions are welcome!
