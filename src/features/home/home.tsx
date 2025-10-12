@@ -18,9 +18,9 @@ export const Home = () => {
                 </Typography.Paragraph>
             </Page.Header>
 
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col items-center">
                 <Typography.Title>Live input</Typography.Title>
-                <div className="rounded-md border border-zinc-700 p-2 space-y-4">
+                <div className="rounded-md border border-zinc-700 p-2 space-y-4 w-xl">
                     <AudioVisualizer bars={18} />
                     <Typography.Paragraph className="text-xs">
                         Hold <RenderKeys keyString={recordShortcut} /> to record
