@@ -11,7 +11,7 @@ export const SettingsUI = {
         return (
             <div
                 className={clsx(
-                    'border border-zinc-700 rounded-md max-w-[600px]',
+                    'border border-zinc-700 rounded-md w-full',
                     className
                 )}
                 {...props}
@@ -29,7 +29,7 @@ export const SettingsUI = {
         return (
             <div
                 className={clsx(
-                    'p-4 justify-between items-center flex flex-row w-xl',
+                    'p-4 justify-between items-center flex flex-row',
                     className
                 )}
                 {...props}

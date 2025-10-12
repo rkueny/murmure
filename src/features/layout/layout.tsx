@@ -7,8 +7,10 @@ export const Layout = () => {
     return (
         <SidebarProvider defaultOpen={true} className="bg-zinc-900 dark">
             <AppSidebar />
-            <SidebarInset className="bg-zinc-900 text-white">
-                <Outlet />
+            <SidebarInset className="bg-zinc-900 text-white p-8 flex items-center">
+                <div className="max-w-[800px] w-full ">
+                    <Outlet />
+                </div>
             </SidebarInset>
             <Toaster />
         </SidebarProvider>

@@ -1,0 +1,38 @@
+import { Typography } from '@/components/typography';
+import { formatTime } from './history.helpers';
+import { useHistoryState } from './hooks/use-history-state';
+
+interface HistoryProps {}
+
+export const History = ({}: HistoryProps) => {
+    const { history } = useHistoryState();
+
+    return (
+        <div className="space-y-2 w-full">
+            <Typography.Title>Recent activity</Typography.Title>
+            {history.length === 0 ? (
+                <Typography.Paragraph>
+                    No transcriptions yet
+                </Typography.Paragraph>
+            ) : (
+                <div className="space-y-2">
+                    {history.map((entry) => (
+                        <div
+                            key={entry.id}
+                            className="rounded-md border border-zinc-700 p-3"
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <Typography.Paragraph>
+                                    {entry.text}
+                                </Typography.Paragraph>
+                                <Typography.Paragraph className="text-xs">
+                                    {formatTime(entry.timestamp)}
+                                </Typography.Paragraph>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};

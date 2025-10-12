@@ -23,44 +23,39 @@ export const Shortcuts = ({}: ShortcutsProps) => {
                     </Typography.Paragraph>
                 </Page.Header>
 
-                <div className="space-y-6 flex justify-center">
-                    <SettingsUI.Container>
-                        <SettingsUI.Item>
-                            <SettingsUI.Description>
-                                <Typography.Title>
-                                    Push to talk
-                                </Typography.Title>
-                                <Typography.Paragraph>
-                                    Hold{' '}
-                                    <RenderKeys keyString={recordShortcut} /> to
-                                    record, release to transcribe.
-                                </Typography.Paragraph>
-                            </SettingsUI.Description>
-                            <ShortcutButton
-                                shortcut={recordShortcut}
-                                saveShortcut={setRecordShortcut}
-                                resetShortcut={resetRecordShortcut}
-                            />
-                        </SettingsUI.Item>
-                        <SettingsUI.Separator />
-                        <SettingsUI.Item>
-                            <SettingsUI.Description>
-                                <Typography.Title>
-                                    Past last transcript
-                                </Typography.Title>
-                                <Typography.Paragraph>
-                                    Press <Kbd>Not available yet</Kbd> to paste
-                                    the last transcript.
-                                </Typography.Paragraph>
-                            </SettingsUI.Description>
-                            <ShortcutButton
-                                shortcut={'Not available yet'}
-                                saveShortcut={() => {}}
-                                resetShortcut={() => {}}
-                            />
-                        </SettingsUI.Item>
-                    </SettingsUI.Container>
-                </div>
+                <SettingsUI.Container>
+                    <SettingsUI.Item>
+                        <SettingsUI.Description>
+                            <Typography.Title>Push to talk</Typography.Title>
+                            <Typography.Paragraph>
+                                Hold <RenderKeys keyString={recordShortcut} />{' '}
+                                to record, release to transcribe.
+                            </Typography.Paragraph>
+                        </SettingsUI.Description>
+                        <ShortcutButton
+                            shortcut={recordShortcut}
+                            saveShortcut={setRecordShortcut}
+                            resetShortcut={resetRecordShortcut}
+                        />
+                    </SettingsUI.Item>
+                    <SettingsUI.Separator />
+                    <SettingsUI.Item>
+                        <SettingsUI.Description>
+                            <Typography.Title>
+                                Past last transcript
+                            </Typography.Title>
+                            <Typography.Paragraph>
+                                Press <Kbd>Not available yet</Kbd> to paste the
+                                last transcript.
+                            </Typography.Paragraph>
+                        </SettingsUI.Description>
+                        <ShortcutButton
+                            shortcut={'Not available yet'}
+                            saveShortcut={() => {}}
+                            resetShortcut={() => {}}
+                        />
+                    </SettingsUI.Item>
+                </SettingsUI.Container>
             </div>
         </main>
     );

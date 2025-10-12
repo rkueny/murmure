@@ -78,6 +78,7 @@ export const ShortcutButton = ({
     const onKeyUp = (e: KeyboardEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        finishRecording();
     };
 
     const onMouseDown = (e: MouseEvent) => {
@@ -105,6 +106,7 @@ export const ShortcutButton = ({
     const onMouseUp = (e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        finishRecording();
     };
 
     const finishRecording = () => {
