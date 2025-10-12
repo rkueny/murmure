@@ -36,9 +36,10 @@ Murmure uses NVIDIA’s Parakeet TDT, a highly optimized, experimental transform
 
 ## Changelog
 
-| Version       | Date       | Notes           |
-| ------------- | ---------- | --------------- |
-| `1.0.0-alpha` | 2025-10-13 | Initial version |
+| Version       | Date       | Notes                               |
+| ------------- | ---------- | ----------------------------------- |
+| `1.1.0-alpha` | 2025-10-13 | Add 'Past last transcript' shortcut |
+| `1.0.0-alpha` | 2025-10-13 | Initial version                     |
 
 ## License
 
