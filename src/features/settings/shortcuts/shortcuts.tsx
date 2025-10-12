@@ -5,12 +5,18 @@ import { RenderKeys } from '../../../components/render-keys';
 import { SettingsUI } from '@/components/settings-ui';
 import { useRecordShortcutState } from './hooks/use-record-shortcut-state';
 import { Page } from '@/components/page';
+import { useLastTranscriptShortcutState } from './hooks/use-last_transcript-shortcut-state';
 
 interface ShortcutsProps {}
 
 export const Shortcuts = ({}: ShortcutsProps) => {
     const { recordShortcut, setRecordShortcut, resetRecordShortcut } =
         useRecordShortcutState();
+    const {
+        lastTranscriptShortcut,
+        setLastTranscriptShortcut,
+        resetLastTranscriptShortcut,
+    } = useLastTranscriptShortcutState();
 
     return (
         <main>
@@ -45,14 +51,16 @@ export const Shortcuts = ({}: ShortcutsProps) => {
                                 Past last transcript
                             </Typography.Title>
                             <Typography.Paragraph>
-                                Press <Kbd>Not available yet</Kbd> to paste the
-                                last transcript.
+                                Press <Kbd>{lastTranscriptShortcut}</Kbd> to
+                                paste the last transcript. Useful when you
+                                forgot to select an input field when you started
+                                recording.
                             </Typography.Paragraph>
                         </SettingsUI.Description>
                         <ShortcutButton
-                            shortcut={'Not available yet'}
-                            saveShortcut={() => {}}
-                            resetShortcut={() => {}}
+                            shortcut={lastTranscriptShortcut}
+                            saveShortcut={setLastTranscriptShortcut}
+                            resetShortcut={resetLastTranscriptShortcut}
                         />
                     </SettingsUI.Item>
                 </SettingsUI.Container>

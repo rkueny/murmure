@@ -18,7 +18,7 @@ use std::sync::Arc;
 use tauri::{DeviceEventFilter, Manager};
 use tray_icon::setup_tray;
 
-use crate::shortcuts::ShortcutKeys;
+use crate::shortcuts::{RecordShortcutKeys, LastTranscriptShortcutKeys};
 
 fn show_main_window(app: &tauri::AppHandle) {
     if let Some(main_window) = app.get_webview_window("main") {
@@ -58,8 +58,11 @@ pub fn run() {
 
             setup_tray(&app.handle())?;
 
-            let keys = shortcuts::parse_binding_keys(&s.shortcut);
-            app.manage(ShortcutKeys::new(keys));
+            let record_keys = shortcuts::parse_binding_keys(&s.record_shortcut);
+            app.manage(RecordShortcutKeys::new(record_keys));
+
+            let last_transcript_keys = shortcuts::parse_binding_keys(&s.last_transcript_shortcut);
+            app.manage(LastTranscriptShortcutKeys::new(last_transcript_keys));
 
             init_shortcuts(app.handle().clone());
             Ok(())
@@ -74,10 +77,12 @@ pub fn run() {
             is_model_available,
             get_model_path,
             get_recent_transcriptions,
-            get_shortcut,
-            set_shortcut,
+            get_record_shortcut,
+            set_record_shortcut,
             set_dictionary,
             get_dictionary,
+            get_last_transcript_shortcut,
+            set_last_transcript_shortcut,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

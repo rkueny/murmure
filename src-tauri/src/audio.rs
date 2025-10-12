@@ -99,25 +99,16 @@ pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
             match preload_engine(app) {
                 Ok(_) => match transcribe_audio(p.as_path()) {
                     Ok(raw_text) => {
-                        println!("Transcription: {}", raw_text);
-
+                        println!("Raw transcription: {}", raw_text);
                         let cc_rules_path = get_cc_rules_path(app).unwrap();
                         let dictionary = app.state::<Dictionary>().get();
                         let text = fix_transcription_with_dictionary(raw_text, dictionary, cc_rules_path);
                         println!("Transcription fixed with dictionary: {}", text);
-
                         if let Err(e) = history::add_transcription(app, text.clone()) {
                             eprintln!("Failed to save to history: {}", e);
                         }
-
-                        if let Err(e) = clipboard::paste(text, app.clone()) {
-                            eprintln!("Failed to paste text: {}", e);
-                        }
-
-                        if let Err(e) = cleanup_recordings(app) {
-                            eprintln!("Failed to cleanup recordings: {}", e);
-                        } else {
-                            println!("All recordings cleaned up");
+                        if let Err(e) = write_transcription(app, &text) {
+                            eprintln!("Failed to use clipboard: {}", e);
                         }
                     }
                     Err(e) => eprintln!("Transcription failed: {}", e),
@@ -139,6 +130,21 @@ pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
         println!("Recording stopped");
     }
     None
+}
+
+pub fn write_transcription(app: &tauri::AppHandle, transcription: &String) -> Result<(), anyhow::Error> {
+    if let Err(e) = clipboard::paste(transcription.clone(), app.clone()) {
+        eprintln!("Failed to paste text: {}", e);
+    }
+
+    if let Err(e) = cleanup_recordings(app) {
+        eprintln!("Failed to cleanup recordings: {}", e);
+    } else {
+        println!("All recordings cleaned up");
+    }
+
+    println!("Transcription written to clipboard {}", transcription);
+    Ok(())
 }
 
 pub fn read_wav_samples(

@@ -4,14 +4,16 @@ use tauri::{AppHandle, Manager};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppSettings {
-    pub shortcut: String,
+    pub record_shortcut: String,
+    pub last_transcript_shortcut: String,
     pub dictionary: Vec<String>,
 }
 
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
-            shortcut: "ctrl+space".to_string(),
+            record_shortcut: "ctrl+space".to_string(),
+            last_transcript_shortcut: "ctrl+shift+space".to_string(),
             dictionary: Vec::new(),
         }
     }

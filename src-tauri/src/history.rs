@@ -84,3 +84,8 @@ pub fn get_recent_transcriptions(app: &AppHandle) -> Result<Vec<HistoryEntry>> {
     let data = read_history(app)?;
     Ok(data.entries)
 }
+
+pub fn get_last_transcription(app: &AppHandle) -> Result<String> {
+    let data = read_history(app)?;
+    Ok(data.entries.first().unwrap().text.clone())
+}

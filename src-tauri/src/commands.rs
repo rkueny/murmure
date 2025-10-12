@@ -2,7 +2,7 @@ use crate::dictionary::Dictionary;
 use crate::history::{self, HistoryEntry};
 use crate::model::Model;
 use crate::settings;
-use crate::shortcuts::{keys_to_string, parse_binding_keys, ShortcutKeys};
+use crate::shortcuts::{keys_to_string, parse_binding_keys, RecordShortcutKeys, LastTranscriptShortcutKeys};
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, State};
 
@@ -24,13 +24,13 @@ pub fn get_recent_transcriptions(app: AppHandle) -> Result<Vec<HistoryEntry>, St
 }
 
 #[tauri::command]
-pub fn get_shortcut(app: AppHandle) -> Result<String, String> {
+pub fn get_record_shortcut(app: AppHandle) -> Result<String, String> {
     let s = settings::load_settings(&app);
-    Ok(s.shortcut)
+    Ok(s.record_shortcut)
 }
 
 #[tauri::command]
-pub fn set_shortcut(app: AppHandle, binding: String) -> Result<String, String> {
+pub fn set_record_shortcut(app: AppHandle, binding: String) -> Result<String, String> {
     let keys = parse_binding_keys(&binding);
     if keys.is_empty() {
         return Err("Invalid shortcut".to_string());
@@ -38,10 +38,10 @@ pub fn set_shortcut(app: AppHandle, binding: String) -> Result<String, String> {
     let normalized = keys_to_string(&keys);
 
     let mut s = settings::load_settings(&app);
-    s.shortcut = normalized.clone();
+    s.record_shortcut = normalized.clone();
     settings::save_settings(&app, &s)?;
 
-    app.state::<ShortcutKeys>().set(keys);
+    app.state::<RecordShortcutKeys>().set(keys);
 
     Ok(normalized)
 }
@@ -61,4 +61,27 @@ pub fn set_dictionary(app: AppHandle, dictionary: Vec<String>) -> Result<(), Str
 pub fn get_dictionary(app: AppHandle) -> Result<Vec<String>, String> {
     let s = settings::load_settings(&app);
     Ok(s.dictionary)
+}
+
+#[tauri::command]
+pub fn get_last_transcript_shortcut(app: AppHandle) -> Result<String, String> {
+    let s = settings::load_settings(&app);
+    Ok(s.last_transcript_shortcut)
+}
+
+#[tauri::command]
+pub fn set_last_transcript_shortcut(app: AppHandle, binding: String) -> Result<String, String> {
+    let keys = parse_binding_keys(&binding);
+    if keys.is_empty() {
+        return Err("Invalid shortcut".to_string());
+    }
+    let normalized = keys_to_string(&keys);
+
+    let mut s = settings::load_settings(&app);
+    s.last_transcript_shortcut = normalized.clone();
+    settings::save_settings(&app, &s)?;
+
+    app.state::<LastTranscriptShortcutKeys>().set(keys);
+
+    Ok(normalized)
 }

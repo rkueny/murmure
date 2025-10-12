@@ -3,10 +3,26 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::GetAsyncKeyState;
+use crate::history::get_last_transcription;
+use crate::audio::write_transcription;
 
-pub struct ShortcutKeys(pub Arc<Mutex<Vec<i32>>>);
+pub struct RecordShortcutKeys(pub Arc<Mutex<Vec<i32>>>);
 
-impl ShortcutKeys {
+impl RecordShortcutKeys {
+    pub fn new(keys: Vec<i32>) -> Self {
+        Self(Arc::new(Mutex::new(keys)))
+    }
+    pub fn get(&self) -> Vec<i32> {
+        self.0.lock().unwrap().clone()
+    }
+    pub fn set(&self, keys: Vec<i32>) {
+        *self.0.lock().unwrap() = keys;
+    }
+}
+
+pub struct LastTranscriptShortcutKeys(pub Arc<Mutex<Vec<i32>>>);
+
+impl LastTranscriptShortcutKeys {
     pub fn new(keys: Vec<i32>) -> Self {
         Self(Arc::new(Mutex::new(keys)))
     }
@@ -156,26 +172,36 @@ pub fn init_shortcuts(app: AppHandle) {
         let app_handle = app.clone();
         let mut is_recording = false;
         loop {
-            let required_keys = app_handle.state::<ShortcutKeys>().get();
+            let record_required_keys = app_handle.state::<RecordShortcutKeys>().get();
+            let last_transcript_required_keys = app_handle.state::<LastTranscriptShortcutKeys>().get();
 
-            if required_keys.is_empty() {
+            if record_required_keys.is_empty() {
                 std::thread::sleep(Duration::from_millis(32));
                 continue;
             }
 
-            let all_keys_down = required_keys.iter().all(|&vk| {
+            let all_record_keys_down = record_required_keys.iter().all(|&vk| {
                 (unsafe { GetAsyncKeyState(vk) } as u16 & 0x8000) != 0
             });
 
-            if !is_recording && all_keys_down {
+            let all_last_transcript_keys_down = last_transcript_required_keys.iter().all(|&vk| {
+                (unsafe { GetAsyncKeyState(vk) } as u16 & 0x8000) != 0
+            });
+
+            if !is_recording && all_record_keys_down {
                 record_audio(&app_handle);
                 is_recording = true;
-                let _ = app_handle.emit("shortcut:start", keys_to_string(&required_keys));
+                let _ = app_handle.emit("shortcut:start", keys_to_string(&record_required_keys));
             }
-            if is_recording && !all_keys_down {
+            if is_recording && !all_record_keys_down {
                 let _ = stop_recording(&app_handle);
                 is_recording = false;
-                let _ = app_handle.emit("shortcut:stop", keys_to_string(&required_keys));
+                let _ = app_handle.emit("shortcut:stop", keys_to_string(&record_required_keys));
+            }
+
+            if !is_recording && all_last_transcript_keys_down {
+                let last_transcript = get_last_transcription(&app_handle).unwrap();
+                let _ = write_transcription(&app_handle, &last_transcript);
             }
 
             std::thread::sleep(Duration::from_millis(32));
