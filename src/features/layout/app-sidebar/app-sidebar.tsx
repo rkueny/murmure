@@ -40,7 +40,10 @@ export const AppSidebar = () => {
     const [settingsOpen, setSettingsOpen] = useState(true);
 
     return (
-        <Sidebar collapsible="none" className="bg-zinc-900 border-zinc-700">
+        <Sidebar
+            collapsible="none"
+            className="bg-zinc-900 border-zinc-700 h-screen"
+        >
             <SidebarHeader className="flex items-center justify-center bg-zinc-900 border-b border-zinc-700">
                 <img src="app-icon.png" alt="logo" className="w-16 h-16" />
             </SidebarHeader>

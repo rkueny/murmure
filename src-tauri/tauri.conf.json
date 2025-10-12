@@ -13,12 +13,10 @@
         "windows": [
             {
                 "title": "Murmure",
-                "width": 960,
-                "height": 720,
-                "minHeight": 610,
+                "width": 920,
+                "height": 768,
                 "minWidth": 870,
-                "maxWidth": 1280,
-                "maxHeight": 720
+                "minHeight": 720
             }
         ],
         "security": {

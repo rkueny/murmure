@@ -20,9 +20,25 @@ use tray_icon::setup_tray;
 
 use crate::shortcuts::ShortcutKeys;
 
+fn show_main_window(app: &tauri::AppHandle) {
+    if let Some(main_window) = app.get_webview_window("main") {
+        if let Err(e) = main_window.show() {
+            eprintln!("Failed to show window: {}", e);
+        }
+        if let Err(e) = main_window.set_focus() {
+            eprintln!("Failed to focus window: {}", e);
+        }
+    } else {
+        eprintln!("Main window not found");
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            show_main_window(app);
+        }))
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
