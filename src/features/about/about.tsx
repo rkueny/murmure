@@ -108,7 +108,7 @@ export const About = () => {
 
                 <div className="flex items-center gap-4">
                     <Typography.Paragraph className="text-xs text-zinc-500">
-                        Version 0.1.0
+                        Version 1.0.0
                     </Typography.Paragraph>
                     <span className="text-zinc-700">•</span>
                     <Typography.Paragraph className="text-xs text-zinc-500">

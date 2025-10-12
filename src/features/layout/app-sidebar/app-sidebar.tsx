@@ -114,7 +114,7 @@ export const AppSidebar = () => {
                         <RefreshCw className="w-3 h-3" />
                         <span>Check for updates</span>
                     </button>
-                    <p className="text-xs text-zinc-500">0.1.0</p>
+                    <p className="text-xs text-zinc-500">1.0.0</p>
                 </div>
             </SidebarFooter>
         </Sidebar>
