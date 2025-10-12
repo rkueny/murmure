@@ -13,18 +13,18 @@ A privacy-first, open-source speech-to-text application that runs entirely on yo
 
 ## Installation
 
-Download the latest [release](https://github.com/Kieirra/murmure/releases) and follow the install wizard.
+Download the latest [release](https://github.com/Kieirra/murmure/releases) and follow the installation wizard.
 
-Note : I did not signe the application on window yet, so OS can see it like dangerous but I can assure there is no malware or anything in the msi. We will signe it when we will be in non release.
+Note: The Windows build is not signed yet, so the OS may flag the MSI as unsafe. There is no malware; the file is safe. We will sign it once we move beyond pre-release.
 
 ## Usage
 
 Murmure provides a clean and focused speech-to-text experience.
-Once launched, simply start recording your voice, the text appears instantly, processed directly on your computer.
+Once launched, simply start recording your voice. The text appears instantly, processed directly on your computer.
 
 Typical use cases include:
 
-- Talking to any AI prompt (Cursor, ChatGPT, Mistral, etc.)
+- Dictating to any AI prompt (Cursor, ChatGPT, Mistral, etc.)
 - Writing notes hands-free
 - Capturing creative ideas or dictation
 
@@ -32,7 +32,7 @@ Because all computation is local, no network connection is required.
 
 ## Technology
 
-Murmure uses NVIDIA’s Parakeet TDT, a highly experimental optimized transformer-based speech recognition model designed for low-latency, on-device inference. It combines fast transcription with strong accuracy across multiple languages, running efficiently on consumer GPUs or CPUs.
+Murmure uses NVIDIA’s Parakeet TDT, a highly optimized, experimental transformer-based speech recognition model designed for low-latency, on-device inference. It combines fast transcription with strong accuracy across multiple languages, running efficiently on consumer GPUs or CPUs.
 
 ## Changelog
 
@@ -43,21 +43,21 @@ Murmure uses NVIDIA’s Parakeet TDT, a highly experimental optimized transforme
 ## License
 
 Murmure is free and open source, released under the GNU GPL v3 License.
-You can inspect, modify, and redistribute it freely as long as derivative work remains open source.
+You can inspect, modify, and redistribute it freely as long as derivative works remain open source.
 
 ## Contributing
 
 Contributions are welcome!
 If you’d like to improve Murmure or report an issue:
 
-0. You need to have install Vs build tools 2022 (with c++ desktop)
+0. Install Visual Studio Build Tools 2022 (Desktop C++ workload)
 1. Fork the repository
 2. Create a feature branch (git checkout -b feature/new-feature)
 3. Commit your changes (git commit -m "Add new feature")
 4. Push and open a pull request
 
-Note that, for some reason, rust will not copy the resources in the right place in dev mode, you need to copy the whole resources folder into `src-tauri/target/debug/_up_/`
+Note: for some reason, Rust does not copy resources to the correct location in dev mode; you need to copy the entire `resources` folder into `src-tauri/target/debug/_up_/`
 
 ## Support Development
 
-If you like Murmure and want to support its continued development: [Support on Tipeee](https://fr.tipeee.com/murmure-al1x-ai/)
+If you like Murmure and want to support its development: [Support on Tipeee](https://fr.tipeee.com/murmure-al1x-ai/)
