@@ -3,8 +3,10 @@ import { Separator } from '../../components/separator';
 import { Page } from '@/components/page';
 import { Typography } from '@/components/typography';
 import { Button } from '@/components/button';
+import { useGetVersion } from '../layout/hooks/use-get-version';
 
 export const About = () => {
+    const version = useGetVersion();
     const features = [
         {
             icon: Lock,
@@ -108,7 +110,7 @@ export const About = () => {
 
                 <div className="flex items-center gap-4">
                     <Typography.Paragraph className="text-xs text-zinc-500">
-                        Version 1.0.0
+                        Version {version}
                     </Typography.Paragraph>
                     <span className="text-zinc-700">•</span>
                     <Typography.Paragraph className="text-xs text-zinc-500">

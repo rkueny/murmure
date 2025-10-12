@@ -24,6 +24,7 @@ import {
     SidebarMenuSubButton,
 } from '../../../components/sidebar';
 import { useLocation } from '@tanstack/react-router';
+import { useGetVersion } from '../hooks/use-get-version';
 
 const settingsSubItems = [
     { name: 'Shortcuts', url: '/settings/shortcuts', icon: Keyboard },
@@ -38,6 +39,7 @@ const settingsSubItems = [
 export const AppSidebar = () => {
     const { pathname } = useLocation();
     const [settingsOpen, setSettingsOpen] = useState(true);
+    const version = useGetVersion();
 
     return (
         <Sidebar
@@ -114,7 +116,7 @@ export const AppSidebar = () => {
                         <RefreshCw className="w-3 h-3" />
                         <span>Check for updates</span>
                     </button>
-                    <p className="text-xs text-zinc-500">1.0.0</p>
+                    <p className="text-xs text-zinc-500">{version}</p>
                 </div>
             </SidebarFooter>
         </Sidebar>
