@@ -7,8 +7,7 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
 
-    let _tray = TrayIconBuilder::new()
-        .icon(app.default_window_icon().unwrap().clone())
+    let builder = TrayIconBuilder::new()
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "show" => {
@@ -35,6 +34,15 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         })
+        ;
+
+    #[cfg(target_os = "linux")]
+    let builder = builder.show_menu_on_left_click(true).icon_as_template(true);
+    #[cfg(target_os = "windows")]
+    let builder = builder;
+
+    let _tray = builder
+        .icon(app.default_window_icon().unwrap().clone())
         .build(app)?;
 
     Ok(())

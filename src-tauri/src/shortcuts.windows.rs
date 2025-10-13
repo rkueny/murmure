@@ -1,10 +1,9 @@
-use crate::audio::{record_audio, stop_recording};
+use crate::audio::{record_audio, stop_recording, write_transcription};
+use crate::history::get_last_transcription;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::GetAsyncKeyState;
-use crate::history::get_last_transcription;
-use crate::audio::write_transcription;
 
 pub struct RecordShortcutKeys(pub Arc<Mutex<Vec<i32>>>);
 
@@ -208,3 +207,5 @@ pub fn init_shortcuts(app: AppHandle) {
         }
     });
 }
+
+

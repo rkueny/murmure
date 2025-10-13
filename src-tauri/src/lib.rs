@@ -6,6 +6,11 @@ mod engine;
 mod history;
 mod model;
 mod settings;
+#[cfg(target_os = "windows")]
+#[path = "shortcuts.windows.rs"]
+mod shortcuts;
+#[cfg(target_os = "linux")]
+#[path = "shortcuts.linux.rs"]
 mod shortcuts;
 mod tray_icon;
 
@@ -18,6 +23,7 @@ use std::sync::Arc;
 use tauri::{DeviceEventFilter, Manager};
 use tray_icon::setup_tray;
 
+#[cfg(target_os = "windows")]
 use crate::shortcuts::{RecordShortcutKeys, LastTranscriptShortcutKeys};
 
 fn show_main_window(app: &tauri::AppHandle) {
@@ -35,13 +41,20 @@ fn show_main_window(app: &tauri::AppHandle) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             show_main_window(app);
         }))
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_clipboard_manager::init());
+
+    #[cfg(target_os = "linux")]
+    let builder = builder.plugin(tauri_plugin_global_shortcut::Builder::new().build());
+    #[cfg(not(target_os = "linux"))]
+    let builder = builder;
+
+    builder
         .device_event_filter(DeviceEventFilter::Never)
         .setup(|app| {
             let model =
@@ -58,11 +71,14 @@ pub fn run() {
 
             setup_tray(&app.handle())?;
 
-            let record_keys = shortcuts::parse_binding_keys(&s.record_shortcut);
-            app.manage(RecordShortcutKeys::new(record_keys));
+            #[cfg(target_os = "windows")]
+            {
+                let record_keys = shortcuts::parse_binding_keys(&s.record_shortcut);
+                app.manage(RecordShortcutKeys::new(record_keys));
 
-            let last_transcript_keys = shortcuts::parse_binding_keys(&s.last_transcript_shortcut);
-            app.manage(LastTranscriptShortcutKeys::new(last_transcript_keys));
+                let last_transcript_keys = shortcuts::parse_binding_keys(&s.last_transcript_shortcut);
+                app.manage(LastTranscriptShortcutKeys::new(last_transcript_keys));
+            }
 
             init_shortcuts(app.handle().clone());
             Ok(())
