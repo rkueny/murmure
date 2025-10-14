@@ -1,8 +1,10 @@
 use tauri::{AppHandle, Emitter, Manager, WebviewWindowBuilder};
+use crate::settings;
 
 const OVERLAY_WIDTH: f64 = 80.0;
 const OVERLAY_HEIGHT: f64 = 18.0;
 const OVERLAY_BOTTOM_OFFSET: f64 = 20.0;
+const OVERLAY_TOP_OFFSET: f64 = 4.0;
 
 fn get_primary_monitor(app_handle: &AppHandle) -> Option<tauri::Monitor> {
     app_handle.primary_monitor().ok().flatten()
@@ -18,7 +20,11 @@ fn calculate_overlay_position(app_handle: &AppHandle) -> Option<(f64, f64)> {
         let work_y = work_area.position.y as f64 / scale;
 
         let x = work_x + (work_w - OVERLAY_WIDTH) / 2.0;
-        let y = work_y + work_h - OVERLAY_HEIGHT - OVERLAY_BOTTOM_OFFSET;
+        let s = settings::load_settings(app_handle);
+        let y = match s.overlay_position.as_str() {
+            "top" => work_y + OVERLAY_TOP_OFFSET,
+            _ => work_y + work_h - OVERLAY_HEIGHT - OVERLAY_BOTTOM_OFFSET,
+        };
         return Some((x, y));
     }
     None
@@ -71,15 +77,15 @@ pub fn show_recording_overlay(app_handle: &AppHandle) {
     }
 }
 
-pub fn show_transcribing_overlay(app_handle: &AppHandle) {
-    ensure_overlay(app_handle);
-    if let Some(window) = app_handle.get_webview_window("recording_overlay") {
-        let _ = window.show();
-        let _ = window.emit("show-overlay", "transcribing");
-    } else {
-        println!("recording_overlay window not found on show_transcribing_overlay");
-    }
-}
+// pub fn show_transcribing_overlay(app_handle: &AppHandle) {
+//     ensure_overlay(app_handle);
+//     if let Some(window) = app_handle.get_webview_window("recording_overlay") {
+//         let _ = window.show();
+//         let _ = window.emit("show-overlay", "transcribing");
+//     } else {
+//         println!("recording_overlay window not found on show_transcribing_overlay");
+//     }
+// }
 
 pub fn update_overlay_position(app_handle: &AppHandle) {
     ensure_overlay(app_handle);

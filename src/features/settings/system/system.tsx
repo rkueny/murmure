@@ -1,12 +1,23 @@
 import { Switch } from '../../../components/switch';
-import { Power } from 'lucide-react';
+import { Eye, Power, Ruler } from 'lucide-react';
 import { Typography } from '@/components/typography';
 import { SettingsUI } from '@/components/settings-ui';
 import { useStartOnBootState } from './hooks/use-auto-start-state';
 import { Page } from '@/components/page';
+import { invoke } from '@tauri-apps/api/core';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/select';
+import { useOverlayState } from './hooks/use-overlay-state';
 
 export const System = () => {
     const { startOnBoot, setStartOnBoot } = useStartOnBootState();
+    const { overlayMode, setOverlayMode, overlayPosition, setOverlayPosition } =
+        useOverlayState();
 
     return (
         <main>
@@ -36,6 +47,87 @@ export const System = () => {
                                 checked={startOnBoot}
                                 onCheckedChange={setStartOnBoot}
                             />
+                        </SettingsUI.Item>
+
+                        <SettingsUI.Separator />
+
+                        <SettingsUI.Item>
+                            <SettingsUI.Description>
+                                <Typography.Title className="flex items-center gap-2">
+                                    <Eye className="w-4 h-4 text-zinc-400" />
+                                    Overlay visibility
+                                </Typography.Title>
+                                <Typography.Paragraph>
+                                    Choose when to show the recording overlay.
+                                </Typography.Paragraph>
+                            </SettingsUI.Description>
+                            <div className="flex gap-2">
+                                <Select
+                                    value={overlayMode}
+                                    onValueChange={(value) => {
+                                        setOverlayMode(
+                                            value as
+                                                | 'hidden'
+                                                | 'recording'
+                                                | 'always'
+                                        );
+                                        invoke('set_overlay_mode', {
+                                            mode: value,
+                                        });
+                                    }}
+                                >
+                                    <SelectTrigger className="w-[150px]">
+                                        <SelectValue placeholder="Select a mode" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="hidden">
+                                            Hidden
+                                        </SelectItem>
+                                        <SelectItem value="recording">
+                                            While recording
+                                        </SelectItem>
+                                        <SelectItem value="always">
+                                            Always
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </SettingsUI.Item>
+                        <SettingsUI.Separator />
+                        <SettingsUI.Item>
+                            <SettingsUI.Description>
+                                <Typography.Title className="flex items-center gap-2">
+                                    <Ruler className="w-4 h-4 text-zinc-400" />
+                                    Overlay position
+                                </Typography.Title>
+                                <Typography.Paragraph>
+                                    Choose whether the overlay appears at the
+                                    top or bottom.
+                                </Typography.Paragraph>
+                            </SettingsUI.Description>
+                            <div className="flex gap-2">
+                                <Select
+                                    value={overlayPosition}
+                                    onValueChange={(value) => {
+                                        setOverlayPosition(
+                                            value as 'top' | 'bottom'
+                                        );
+                                        invoke('set_overlay_position', {
+                                            position: value,
+                                        });
+                                    }}
+                                >
+                                    <SelectTrigger className="w-[150px]">
+                                        <SelectValue placeholder="Select a position" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="top">Top</SelectItem>
+                                        <SelectItem value="bottom">
+                                            Bottom
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </SettingsUI.Item>
                     </SettingsUI.Container>
                 </div>

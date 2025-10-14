@@ -3,10 +3,13 @@ use std::{fs, path::PathBuf};
 use tauri::{AppHandle, Manager};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(default)]
 pub struct AppSettings {
     pub record_shortcut: String,
     pub last_transcript_shortcut: String,
     pub dictionary: Vec<String>,
+    pub overlay_mode: String,       // "hidden" | "recording" | "always"
+    pub overlay_position: String,   // "top" | "bottom"
 }
 
 impl Default for AppSettings {
@@ -15,6 +18,8 @@ impl Default for AppSettings {
             record_shortcut: "ctrl+space".to_string(),
             last_transcript_shortcut: "ctrl+shift+space".to_string(),
             dictionary: Vec::new(),
+            overlay_mode: "recording".to_string(),
+            overlay_position: "bottom".to_string(),
         }
     }
 }

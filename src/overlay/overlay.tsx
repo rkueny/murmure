@@ -3,10 +3,7 @@ import { AudioVisualizer } from '@/features/home/audio-visualizer/audio-visualiz
 
 export const Overlay: React.FC = () => {
     return (
-        <div
-            data-tauri-drag-region
-            className="w-[80px] h-[18px] bg-black/70 rounded-sm flex items-center justify-center select-none overflow-hidden"
-        >
+        <div className="w-[80px] h-[18px] bg-black/70 rounded-sm flex items-center justify-center select-none overflow-hidden">
             <div className="origin-center">
                 <AudioVisualizer
                     bars={14}
