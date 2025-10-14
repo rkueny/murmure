@@ -13,7 +13,7 @@ import {
 } from '@/components/select';
 import { useOverlayState } from './hooks/use-overlay-state';
 
-export const System = async () => {
+export const System = () => {
     const { startOnBoot, setStartOnBoot } = useStartOnBootState();
     const {
         overlayMode,

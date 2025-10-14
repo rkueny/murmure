@@ -15,12 +15,11 @@ export const useOverlayState = () => {
             if (m === 'hidden' || m === 'recording' || m === 'always')
                 setOverlayMode(m);
         });
+
         invoke<string>('get_overlay_position').then((p) => {
             if (p === 'top' || p === 'bottom') setOverlayPosition(p);
         });
-    }, []);
 
-    useEffect(() => {
         const fetchPlatform = async () => {
             const platform = await invoke<string>('plugin:os|platform');
             if (platform === 'linux') {
