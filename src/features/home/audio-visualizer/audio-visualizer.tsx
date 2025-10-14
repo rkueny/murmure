@@ -6,12 +6,17 @@ import { AudioPixel } from './audio-pixel/audio-pixel';
 interface AudioVisualizerProps {
     bars?: number;
     rows?: number;
+    audioPixelWidth?: number;
+    audioPixelHeight?: number;
+    pixelHeight?: number;
     className?: string;
 }
 
 export const AudioVisualizer = ({
     bars = 16,
     rows = 20,
+    audioPixelWidth = 12,
+    audioPixelHeight = 6,
     className,
 }: AudioVisualizerProps) => {
     const { level } = useLevelState();
@@ -74,6 +79,8 @@ export const AudioVisualizer = ({
                                     isEdgeColumn={isEdgeColumn}
                                     isCenterColumn={isCenterColumn}
                                     hasSound={hasSound}
+                                    width={audioPixelWidth}
+                                    height={audioPixelHeight}
                                 />
                             );
                         })}

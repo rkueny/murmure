@@ -6,6 +6,7 @@ mod engine;
 mod history;
 mod model;
 mod settings;
+mod overlay;
 #[cfg(target_os = "windows")]
 #[path = "shortcuts.windows.rs"]
 mod shortcuts;
@@ -51,7 +52,7 @@ pub fn run() {
 
     #[cfg(target_os = "linux")]
     let builder = builder.plugin(tauri_plugin_global_shortcut::Builder::new().build());
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "windows")]
     let builder = builder;
 
     builder
@@ -71,8 +72,15 @@ pub fn run() {
 
             setup_tray(&app.handle())?;
 
+
             #[cfg(target_os = "windows")]
             {
+                // TODO: Not sure it works on linux, will have to check later
+                overlay::create_recording_overlay(&app.handle());
+                if let Some(overlay_window) = app.get_webview_window("recording_overlay") {
+                    let _ = overlay_window.show();
+                }
+
                 let record_keys = shortcuts::parse_binding_keys(&s.record_shortcut);
                 app.manage(RecordShortcutKeys::new(record_keys));
 

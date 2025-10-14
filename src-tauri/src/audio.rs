@@ -3,6 +3,7 @@ use crate::engine::{
     engine::ParakeetEngine, engine::ParakeetModelParams, transcription_engine::TranscriptionEngine,
 };
 use crate::history;
+use crate::overlay;
 use crate::model::Model;
 use anyhow::{Context, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -71,6 +72,8 @@ pub fn record_audio(app: &tauri::AppHandle) {
     *STREAM.lock().unwrap() = Some(stream);
 
     println!("Recording started");
+    // TODO: make it configurable, either always visible or only when recording or never
+    overlay::show_recording_overlay(app);
 }
 
 pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
@@ -125,6 +128,9 @@ pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
         }
         // Emit a final zero level to let frontend reset visualizer
         let _ = app.emit("mic-level", 0.0f32);
+
+        // TODO: make it configurable, either always visible or only when recording or never
+        overlay::hide_recording_overlay(app);
         return path;
     } else {
         println!("Recording stopped");
@@ -331,10 +337,17 @@ where
                         // EMA smoothing
                         ema_level = alpha * level + (1.0 - alpha) * ema_level;
                         let _ = app.emit("mic-level", ema_level);
+                        // also forward to overlay window if present
+                        if let Some(overlay_window) = app.get_webview_window("recording_overlay") {
+                            let _ = overlay_window.emit("mic-level", ema_level);
+                        }
                         acc_sum_squares = 0.0;
                         acc_count = 0;
                     } else {
                         let _ = app.emit("mic-level", 0.0f32);
+                        if let Some(overlay_window) = app.get_webview_window("recording_overlay") {
+                            let _ = overlay_window.emit("mic-level", 0.0f32);
+                        }
                     }
                     last_emit = std::time::Instant::now();
                 }
