@@ -3,8 +3,8 @@ use crate::settings;
 
 const OVERLAY_WIDTH: f64 = 80.0;
 const OVERLAY_HEIGHT: f64 = 18.0;
-const OVERLAY_BOTTOM_OFFSET: f64 = 20.0;
-const OVERLAY_TOP_OFFSET: f64 = 4.0;
+const OVERLAY_TOP_OFFSET_PCT: f64 = 0.03;
+const OVERLAY_BOTTOM_OFFSET_PCT: f64 = 0.03;
 
 fn get_primary_monitor(app_handle: &AppHandle) -> Option<tauri::Monitor> {
     app_handle.primary_monitor().ok().flatten()
@@ -22,8 +22,8 @@ fn calculate_overlay_position(app_handle: &AppHandle) -> Option<(f64, f64)> {
         let x = work_x + (work_w - OVERLAY_WIDTH) / 2.0;
         let s = settings::load_settings(app_handle);
         let y = match s.overlay_position.as_str() {
-            "top" => work_y + OVERLAY_TOP_OFFSET,
-            _ => work_y + work_h - OVERLAY_HEIGHT - OVERLAY_BOTTOM_OFFSET,
+            "top" => work_y + work_h * OVERLAY_TOP_OFFSET_PCT,
+            _ => work_y + work_h * (1.0 - OVERLAY_BOTTOM_OFFSET_PCT) - OVERLAY_HEIGHT,
         };
         return Some((x, y));
     }
