@@ -5,6 +5,7 @@ import { SettingsUI } from '@/components/settings-ui';
 import { useRecordShortcutState } from './hooks/use-record-shortcut-state';
 import { Page } from '@/components/page';
 import { useLastTranscriptShortcutState } from './hooks/use-last_transcript-shortcut-state';
+import { isMacOS } from '@/components/lib/utils';
 
 interface ShortcutsProps {}
 
@@ -16,6 +17,8 @@ export const Shortcuts = ({}: ShortcutsProps) => {
         setLastTranscriptShortcut,
         resetLastTranscriptShortcut,
     } = useLastTranscriptShortcutState();
+
+    const isMac = isMacOS();
 
     return (
         <main>
@@ -32,8 +35,11 @@ export const Shortcuts = ({}: ShortcutsProps) => {
                         <SettingsUI.Description>
                             <Typography.Title>Push to talk</Typography.Title>
                             <Typography.Paragraph>
-                                Hold <RenderKeys keyString={recordShortcut} />{' '}
-                                to record, release to transcribe.
+                                {isMac ? (
+                                    <>Press <RenderKeys keyString={recordShortcut} /> once to start, press again to stop (or auto-stops after 60s).</>
+                                ) : (
+                                    <>Hold <RenderKeys keyString={recordShortcut} /> to record, release to transcribe.</>
+                                )}
                             </Typography.Paragraph>
                         </SettingsUI.Description>
                         <ShortcutButton

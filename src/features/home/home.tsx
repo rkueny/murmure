@@ -4,17 +4,22 @@ import { AudioVisualizer } from './audio-visualizer/audio-visualizer';
 import { History } from './history/history';
 import { Page } from '@/components/page';
 import { Typography } from '@/components/typography';
+import { isMacOS } from '@/components/lib/utils';
 
 export const Home = () => {
     const { recordShortcut } = useRecordShortcutState();
+    const isMac = isMacOS();
+
     return (
         <main className="space-y-8">
             <Page.Header>
                 <Typography.MainTitle>Home</Typography.MainTitle>
                 <Typography.Paragraph className="text-zinc-400">
-                    Murmure use default microphone to record your voice. Try to
-                    hold <RenderKeys keyString={recordShortcut} /> to start
-                    recording.
+                    Murmure use default microphone to record your voice. {isMac ? (
+                        <>Press <RenderKeys keyString={recordShortcut} /> once to start recording, press again to stop (auto-stops after 60s).</>
+                    ) : (
+                        <>Try to hold <RenderKeys keyString={recordShortcut} /> to start recording.</>
+                    )}
                 </Typography.Paragraph>
             </Page.Header>
 
@@ -24,8 +29,11 @@ export const Home = () => {
                     <div className="rounded-md border border-zinc-700 p-2 space-y-4 relative">
                         <AudioVisualizer bars={34} rows={21} />
                         <Typography.Paragraph className="text-xs absolute bottom-2 left-2">
-                            Hold <RenderKeys keyString={recordShortcut} /> to
-                            record
+                            {isMac ? (
+                                <>Press <RenderKeys keyString={recordShortcut} /> to toggle recording</>
+                            ) : (
+                                <>Hold <RenderKeys keyString={recordShortcut} /> to record</>
+                            )}
                         </Typography.Paragraph>
                     </div>
                 </div>

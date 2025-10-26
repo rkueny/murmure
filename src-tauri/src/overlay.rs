@@ -32,7 +32,7 @@ fn calculate_overlay_position(app_handle: &AppHandle) -> Option<(f64, f64)> {
 
 pub fn create_recording_overlay(app_handle: &AppHandle) {
     if let Some((x, y)) = calculate_overlay_position(app_handle) {
-        let res = WebviewWindowBuilder::new(
+        let mut builder = WebviewWindowBuilder::new(
             app_handle,
             "recording_overlay",
             tauri::WebviewUrl::App("src/overlay/index.html".into()),
@@ -48,11 +48,18 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
         .accept_first_mouse(true)
         .decorations(false)
         .always_on_top(true)
-        .skip_taskbar(true)
-        .transparent(true)
-        .focused(false)
-        .visible(false)
-        .build();
+        .skip_taskbar(true);
+
+        // Transparent windows are not supported on macOS without private APIs
+        #[cfg(not(target_os = "macos"))]
+        {
+            builder = builder.transparent(true);
+        }
+
+        let res = builder
+            .focused(false)
+            .visible(false)
+            .build();
         if let Err(e) = res {
             println!("Failed to create recording overlay window: {}", e);
         } else {

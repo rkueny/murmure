@@ -41,6 +41,12 @@
                     "/usr/resources": "../resources/"
                 }
             }
+        },
+        "macOS": {
+            "minimumSystemVersion": "10.15",
+            "entitlements": "Info.plist",
+            "frameworks": [],
+            "exceptionDomain": ""
         }
     },
     "plugins": {
