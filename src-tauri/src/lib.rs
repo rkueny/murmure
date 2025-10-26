@@ -11,7 +11,7 @@ mod settings;
 mod shortcuts;
 mod tray_icon;
 
-use audio::preload_engine;
+use audio::{preload_engine, request_microphone_permission};
 use commands::*;
 use dictionary::Dictionary;
 use http_api::HttpApiState;
@@ -78,6 +78,9 @@ pub fn run() {
             app.manage(LastTranscriptShortcutKeys::new(last_transcript_keys));
 
             app.manage(TranscriptionSuspended::new(false));
+
+            // Request microphone permission early on macOS to avoid multiple restarts
+            request_microphone_permission();
 
             init_shortcuts(app.handle().clone());
 

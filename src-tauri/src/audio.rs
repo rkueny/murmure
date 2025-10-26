@@ -10,7 +10,10 @@ use anyhow::{Context, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use hound::{WavSpec, WavWriter};
 use once_cell::sync::Lazy;
+#[cfg(not(target_os = "macos"))]
 use parking_lot::Mutex;
+#[cfg(target_os = "macos")]
+use std::sync::Mutex;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::PathBuf;
@@ -22,19 +25,75 @@ use tauri::Manager;
 type WavWriterType = WavWriter<BufWriter<File>>;
 type RecorderType = Mutex<Option<WavWriterType>>;
 
-static RECORDER: Lazy<parking_lot::Mutex<Option<Arc<RecorderType>>>> =
-    Lazy::new(|| parking_lot::Mutex::new(None));
-static STREAM: Lazy<parking_lot::Mutex<Option<cpal::Stream>>> =
-    Lazy::new(|| parking_lot::Mutex::new(None));
-static CURRENT_FILE_NAME: Lazy<parking_lot::Mutex<Option<String>>> =
-    Lazy::new(|| parking_lot::Mutex::new(None));
-static ENGINE: Lazy<parking_lot::Mutex<Option<ParakeetEngine>>> =
-    Lazy::new(|| parking_lot::Mutex::new(None));
+// On macOS, cpal::Stream is not Send due to Objective-C callbacks
+// We wrap it and mark as Send since we ensure it's used safely
+#[cfg(target_os = "macos")]
+struct SendStream(#[allow(dead_code)] cpal::Stream);
+
+#[cfg(target_os = "macos")]
+unsafe impl Send for SendStream {}
+
+// Helper macro to handle the different lock() APIs between parking_lot and std
+#[cfg(not(target_os = "macos"))]
+macro_rules! lock_mutex {
+    ($mutex:expr) => {
+        $mutex.lock()
+    };
+}
+
+#[cfg(target_os = "macos")]
+macro_rules! lock_mutex {
+    ($mutex:expr) => {
+        $mutex.lock().unwrap()
+    };
+}
+
+static RECORDER: Lazy<Mutex<Option<Arc<RecorderType>>>> =
+    Lazy::new(|| Mutex::new(None));
+
+#[cfg(not(target_os = "macos"))]
+static STREAM: Lazy<Mutex<Option<cpal::Stream>>> =
+    Lazy::new(|| Mutex::new(None));
+
+#[cfg(target_os = "macos")]
+static STREAM: Lazy<Mutex<Option<SendStream>>> =
+    Lazy::new(|| Mutex::new(None));
+
+static CURRENT_FILE_NAME: Lazy<Mutex<Option<String>>> =
+    Lazy::new(|| Mutex::new(None));
+static ENGINE: Lazy<Mutex<Option<ParakeetEngine>>> =
+    Lazy::new(|| Mutex::new(None));
+
+/// Request microphone permission on macOS
+/// This triggers the permission dialog before any actual recording happens
+#[cfg(target_os = "macos")]
+pub fn request_microphone_permission() {
+    println!("Requesting microphone permission...");
+    let host = cpal::default_host();
+    if let Some(device) = host.default_input_device() {
+        if let Ok(config) = device.default_input_config() {
+            // Build a temporary stream to trigger permission request
+            let _stream = device.build_input_stream(
+                &config.into(),
+                move |_data: &[f32], _: &cpal::InputCallbackInfo| {},
+                |_err| {},
+                None,
+            );
+            // Stream is immediately dropped, we just needed to trigger the permission
+            println!("Microphone permission requested");
+        }
+    }
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn request_microphone_permission() {
+    // No-op on other platforms
+}
 
 pub fn record_audio(app: &tauri::AppHandle) {
     println!("Starting audio recording...");
 
-    if RECORDER.lock().is_some() {
+    if lock_mutex!(RECORDER).is_some() {
         println!("Already recording");
         return;
     }
@@ -48,7 +107,7 @@ pub fn record_audio(app: &tauri::AppHandle) {
     };
     let file_name = generate_unique_wav_name();
     let file_path = recordings_dir.join(&file_name);
-    *CURRENT_FILE_NAME.lock() = Some(file_name.clone());
+    *lock_mutex!(CURRENT_FILE_NAME) = Some(file_name.clone());
 
     let host = cpal::default_host();
     let device = match host.default_input_device() {
@@ -90,7 +149,7 @@ pub fn record_audio(app: &tauri::AppHandle) {
 
     let writer_arc = Arc::new(Mutex::new(Some(wav_writer)));
 
-    *RECORDER.lock() = Some(writer_arc.clone());
+    *lock_mutex!(RECORDER) = Some(writer_arc.clone());
 
     let stream = match config.sample_format() {
         cpal::SampleFormat::F32 => build_stream::<f32>(&device, &config, writer_arc, app.clone()),
@@ -109,7 +168,16 @@ pub fn record_audio(app: &tauri::AppHandle) {
             return;
         }
     }
-    *STREAM.lock() = Some(stream);
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        *lock_mutex!(STREAM) = Some(stream);
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        *lock_mutex!(STREAM) = Some(SendStream(stream));
+    }
 
     println!("Recording started");
     let s = crate::settings::load_settings(app);
@@ -121,11 +189,11 @@ pub fn record_audio(app: &tauri::AppHandle) {
 pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
     println!("Stopping audio recording...");
 
-    if let Some(stream) = STREAM.lock().take() {
+    if let Some(stream) = lock_mutex!(STREAM).take() {
         drop(stream);
     }
-    if let Some(recorder_arc) = RECORDER.lock().take() {
-        let mut recorder = recorder_arc.lock();
+    if let Some(recorder_arc) = lock_mutex!(RECORDER).take() {
+        let mut recorder = lock_mutex!(recorder_arc);
         if let Some(writer) = recorder.take() {
             if let Err(e) = writer.finalize() {
                 eprintln!("Failed to finalize WAV file: {}", e);
@@ -133,7 +201,7 @@ pub fn stop_recording(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
         }
     }
 
-    if let Some(file_name) = CURRENT_FILE_NAME.lock().take() {
+    if let Some(file_name) = lock_mutex!(CURRENT_FILE_NAME).take() {
         let path = ensure_recordings_dir(app)
             .map(|dir| dir.join(&file_name))
             .ok();
@@ -255,7 +323,7 @@ pub fn read_wav_samples(wav_path: &std::path::Path) -> Result<Vec<f32>> {
 }
 
 pub fn preload_engine(app: &tauri::AppHandle) -> Result<()> {
-    let mut engine = ENGINE.lock();
+    let mut engine = lock_mutex!(ENGINE);
 
     if engine.is_none() {
         let model = app.state::<Arc<Model>>();
@@ -278,7 +346,7 @@ pub fn preload_engine(app: &tauri::AppHandle) -> Result<()> {
 pub fn transcribe_audio(audio_path: &std::path::Path) -> Result<String> {
     let samples = read_wav_samples(audio_path)?;
 
-    let mut engine = ENGINE.lock();
+    let mut engine = lock_mutex!(ENGINE);
     let engine = engine
         .as_mut()
         .ok_or_else(|| anyhow::anyhow!("Engine not loaded"))?;
@@ -358,7 +426,7 @@ where
         .build_input_stream(
             &config.clone().into(),
             move |data: &[T], _: &cpal::InputCallbackInfo| {
-                let mut recorder = writer.lock();
+                let mut recorder = lock_mutex!(writer);
                 if let Some(writer) = recorder.as_mut() {
                     for frame in data.chunks_exact(channels) {
                         let sample = if channels == 1 {
